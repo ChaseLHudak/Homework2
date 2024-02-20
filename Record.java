@@ -1,3 +1,4 @@
+
 //Author: Keidan Smith
 //Program Name: Record.java
 import java.io.IOException;
@@ -5,18 +6,18 @@ import java.io.IOException;
 //RECORD CLASS
 public class Record {
 
-    //Variables
+    // Variables
     private boolean empty;
     public String id, firstName, lastName, age, ticketNum, fare, purchaseDate;
 
-    //Constructor
+    // Constructor
     public Record() {
         empty = true;
     }
-    
-    //Updates Fields With New Values
+
+    // Updates Fields With New Values
     public void updateFields(String[] fields) throws IOException {
-        if(fields.length == 7) {
+        if (fields.length == 7) {
             this.id = fields[0];
             this.lastName = fields[1];
             this.firstName = fields[2];
@@ -26,25 +27,34 @@ public class Record {
             this.purchaseDate = fields[6];
 
             empty = false;
-        }
-        else {
+        } else {
             throw new IOException();
         }
     }
 
-    //Checks The Empty Status Of Record
+    public void empty() {
+        id = "_empty_";
+        lastName = "NIL";
+        firstName = "NIL";
+        age = "NIL";
+        ticketNum = "NIL";
+        fare = "NIL";
+        purchaseDate = "NIL";
+    }
+
+    // Checks The Empty Status Of Record
     public boolean isEmpty() {
         return empty;
     }
-    
-    //Returns A String Of The Record Fields
+
+    // Returns A String Of The Record Fields
     public String toString() {
         return "Id: " + this.id +
-            ", Last Name: " + this.lastName +
-            ", First Name: " + this.firstName +
-            ", Age: " + this.age +
-            ", Ticket Number: " + this.ticketNum +
-            ", Fare: " + this.fare +
-            ", Date of Purchase: " + this.purchaseDate;
+                ", Last Name: " + this.lastName +
+                ", First Name: " + this.firstName +
+                ", Age: " + this.age +
+                ", Ticket Number: " + this.ticketNum +
+                ", Fare: " + this.fare +
+                ", Date of Purchase: " + this.purchaseDate;
     }
 }

@@ -91,43 +91,21 @@ public class DB {
     // WRITE RECORD
     private int writeRecord(int recordNum, String id, String lastName, String firstName, String age, String ticketNum,
             String fare, String purchaseDate, RandomAccessFile writeFile) {
-        // Writes Records To Given Database
-        // if (isOpen) {
-        // try {
-        // din.close();
-        // } catch (Exception e) {
-        // System.out.println("There was an error while attempting to close the database
-        // file before deleting.\n");
-        // }
-
-        // } else {
-        // System.out.println("NO FILE OPEN");
-        // }
-        // Delete
         try {
             if (id != null) { // Previous this.id
-                System.out.println(id + (id != null) + " IN WRITE" + recordNum + " LastName " + lastName);
                 writeFile.skipBytes(recordSize * recordNum);
-                System.out.println("Passenger ID: " + id);
-                System.out.println("Last Name: " + lastName);
-                System.out.println("First Name: " + firstName);
-                System.out.println("Age: " + age);
-                System.out.println("Ticket Number: " + ticketNum);
-                System.out.println("Fare: " + fare);
-                System.out.println("Purchase Date: " + purchaseDate);
-                // file.skipBytes(recordSize * recordNum);
-                writeFile.writeBytes(String.format("%" + idSize + "s", id.substring(0, Math.min(id.length(), idSize))));
-                writeFile.writeBytes(String.format("%" + lNameSize + "s",
+                writeFile.writeBytes(String.format("%-" + idSize + "s", id.substring(0, Math.min(id.length(), idSize))));
+                writeFile.writeBytes(String.format("%-" + lNameSize + "s",
                         lastName.substring(0, Math.min(lastName.length(), lNameSize))));
-                writeFile.writeBytes(String.format("%" + fNameSize + "s",
+                writeFile.writeBytes(String.format("%-" + fNameSize + "s",
                         firstName.substring(0, Math.min(firstName.length(), fNameSize))));
                 writeFile.writeBytes(
-                        String.format("%" + ageSize + "s", age.substring(0, Math.min(age.length(), ageSize))));
-                writeFile.writeBytes(String.format("%" + tNumSize + "s",
+                        String.format("%-" + ageSize + "s", age.substring(0, Math.min(age.length(), ageSize))));
+                writeFile.writeBytes(String.format("%-" + tNumSize + "s",
                         ticketNum.substring(0, Math.min(ticketNum.length(), tNumSize))));
                 writeFile.writeBytes(
-                        String.format("%" + fareSize + "s", fare.substring(0, Math.min(fare.length(), fareSize))));
-                writeFile.writeBytes(String.format("%" + pDateSize + "s\n",
+                        String.format("%-" + fareSize + "s", fare.substring(0, Math.min(fare.length(), fareSize))));
+                writeFile.writeBytes(String.format("%-" + pDateSize + "s\n",
                         purchaseDate.substring(0, Math.min(purchaseDate.length(), pDateSize))));
                 numRecords++;
             } else {
@@ -346,8 +324,7 @@ public class DB {
                         record.purchaseDate = tempRecord.purchaseDate;
                     }
                     System.err.println(file + " fileName" + this.file + " " + din);
-                    int tf = writeRecord(Middle, record.id, record.lastName, record.firstName, record.age,
-                            record.ticketNum, record.fare, record.purchaseDate, file);
+                    int tf = writeRecord(Middle, record.id, record.lastName, record.firstName, record.age, record.ticketNum, record.fare, record.purchaseDate, file);
                     if (tf == 1) {
                         System.out.println(Middle + " Record Deleted");
                     } else {
@@ -515,36 +492,7 @@ public class DB {
     }
 
     // // ADD RECORD
-    // public boolean addRecord(Record newRecord) throws IOException {
-    // if (!isOpen()) {
-    // System.out.println("Database is not open.");
-    // return false;
-    // }
 
-    // int emptyRecordNumber = findEmptyRecord();
-    // if (emptyRecordNumber != -1) {
-    // // Write the new record to the empty record found
-    // writeRecord(emptyRecordNumber, newRecord);
-    // System.out.println("Record added successfully.");
-    // return true;
-    // } else {
-    // // If no empty record found, double the file size and update the config file
-    // // (implementation not provided here)
-    // System.out.println("No empty record found. Implement file resizing logic.");
-    // return false;
-    // }
-    // }
-    // int nonEmptyRecord = findEmptyRecord(Middle, Low, High);
-
-    // private int findEmptyRecord(int recordN) throws IOException {
-    // for (int i = recordN; i < recordSize; i++) { // Assuming there are 10 records
-    // Record record = new Record();
-    // if (readRecord(i, record) && record.isEmpty()) {
-    // return i;
-    // }
-    // }
-    // return -1; // No empty record found
-    // }
 
     private int findEmptyRecord(int start, int lowLimit, int highLimit) {
         int backStep = 1; // Step size for backward search

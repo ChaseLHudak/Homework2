@@ -1,21 +1,15 @@
-
-//Author: Keidan Smith
-//Program Name: Record.java
 import java.io.IOException;
 
-//RECORD CLASS
 public class Record {
 
-    // Variables
     private boolean empty;
     public String id, firstName, lastName, age, ticketNum, fare, purchaseDate;
 
-    // Constructor
     public Record() {
         empty = true;
+        id = ""; // Initialize id to an empty string
     }
 
-    // Updates Fields With New Values
     public void updateFields(String[] fields) throws IOException {
         if (fields.length == 7) {
             this.id = fields[0];
@@ -42,12 +36,10 @@ public class Record {
         purchaseDate = "NIL";
     }
 
-    // Checks The Empty Status Of Record
     public boolean isEmpty() {
         return empty;
     }
 
-    // Returns A String Of The Record Fields
     public String toString() {
         return "Id: " + this.id +
                 ", Last Name: " + this.lastName +

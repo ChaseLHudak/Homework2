@@ -96,20 +96,31 @@ public class DB {
         try {
             if (id != null) { // Previous this.id
                 System.out.println(id + (id != null) + " IN WRITE" + recordNum + " LastName " + lastName);
-                file.skipBytes(recordSize * this.recordNum);
-                file.writeBytes(String.format("%" + idSize + "s", id.substring(0, Math.min(this.id.length(), idSize))));
+                if (recordNum != 0) {
+                    file.skipBytes(recordSize * recordNum);
+                }
+
+                System.out.println("Passenger ID: " + id);
+                System.out.println("Last Name: " + lastName);
+                System.out.println("First Name: " + firstName);
+                System.out.println("Age: " + age);
+                System.out.println("Ticket Number: " + ticketNum);
+                System.out.println("Fare: " + fare);
+                System.out.println("Purchase Date: " + purchaseDate);
+                // file.skipBytes(recordSize * recordNum);
+                file.writeBytes(String.format("%" + idSize + "s", id.substring(0, Math.min(id.length(), idSize))));
                 file.writeBytes(String.format("%" + lNameSize + "s",
-                        lastName.substring(0, Math.min(this.lastName.length(), lNameSize))));
+                        lastName.substring(0, Math.min(lastName.length(), lNameSize))));
                 file.writeBytes(String.format("%" + fNameSize + "s",
-                        firstName.substring(0, Math.min(this.firstName.length(), fNameSize))));
+                        firstName.substring(0, Math.min(firstName.length(), fNameSize))));
                 file.writeBytes(
-                        String.format("%" + ageSize + "s", age.substring(0, Math.min(this.age.length(), ageSize))));
+                        String.format("%" + ageSize + "s", age.substring(0, Math.min(age.length(), ageSize))));
                 file.writeBytes(String.format("%" + tNumSize + "s",
-                        ticketNum.substring(0, Math.min(this.ticketNum.length(), tNumSize))));
+                        ticketNum.substring(0, Math.min(ticketNum.length(), tNumSize))));
                 file.writeBytes(
-                        String.format("%" + fareSize + "s", fare.substring(0, Math.min(this.fare.length(), fareSize))));
+                        String.format("%" + fareSize + "s", fare.substring(0, Math.min(fare.length(), fareSize))));
                 file.writeBytes(String.format("%" + pDateSize + "s\n",
-                        purchaseDate.substring(0, Math.min(this.purchaseDate.length(), pDateSize))));
+                        purchaseDate.substring(0, Math.min(purchaseDate.length(), pDateSize))));
                 numRecords++;
             } else {
                 System.out.println("ID is null.");
@@ -312,13 +323,16 @@ public class DB {
                     recordNum[0] = Middle;
                     // Update the record object with the found record
                     // (Assuming record has these fields)
-                    record.id = tempRecord.id;
-                    record.lastName = tempRecord.lastName;
-                    record.firstName = tempRecord.firstName;
-                    record.age = tempRecord.age;
-                    record.ticketNum = tempRecord.ticketNum;
-                    record.fare = tempRecord.fare;
-                    record.purchaseDate = tempRecord.purchaseDate;
+                    if (record.lastName != "NIL") {
+                        record.id = tempRecord.id;
+                        record.lastName = tempRecord.lastName;
+                        record.firstName = tempRecord.firstName;
+                        record.age = tempRecord.age;
+                        record.ticketNum = tempRecord.ticketNum;
+                        record.fare = tempRecord.fare;
+                        record.purchaseDate = tempRecord.purchaseDate;
+                    }
+                    System.err.println(file + " fileName");
                     int tf = writeRecord(Middle, record.id, record.lastName, record.firstName, record.age,
                             record.ticketNum, record.fare, record.purchaseDate, file);
                     if (tf == 1) {

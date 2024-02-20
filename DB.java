@@ -15,7 +15,6 @@ public class DB {
     private boolean isOpen = false;
     private RandomAccessFile din;
     private RandomAccessFile file;
-
     private int numRecords;
     private int recordNum;
     private String id, lastName, firstName, age, ticketNum, fare, purchaseDate;
@@ -108,10 +107,7 @@ public class DB {
         try {
             if (id != null) { // Previous this.id
                 System.out.println(id + (id != null) + " IN WRITE" + recordNum + " LastName " + lastName);
-                if (recordNum != 0) {
-                    writeFile.skipBytes(recordSize * recordNum);
-                }
-
+                writeFile.skipBytes(recordSize * recordNum);
                 System.out.println("Passenger ID: " + id);
                 System.out.println("Last Name: " + lastName);
                 System.out.println("First Name: " + firstName);
@@ -300,6 +296,11 @@ public class DB {
         int High = numRecords - 1;
         boolean Found = false;
         Record tempRecord = new Record();
+        try {
+            file = openFile(openFileName + ".data");
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
 
         while (!Found && High >= Low) {
             int Middle = (Low + High) / 2;
@@ -346,7 +347,7 @@ public class DB {
                     }
                     System.err.println(file + " fileName" + this.file + " " + din);
                     int tf = writeRecord(Middle, record.id, record.lastName, record.firstName, record.age,
-                            record.ticketNum, record.fare, record.purchaseDate, din);
+                            record.ticketNum, record.fare, record.purchaseDate, file);
                     if (tf == 1) {
                         System.out.println(Middle + " Record Deleted");
                     } else {

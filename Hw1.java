@@ -110,11 +110,12 @@ public class Hw1 {
                 // 9) Delete Record TO BE IMPLEMENTED IN PART II
                 case "9":
                     System.out.print("Please enter a record number to delete: ");
-                    int inputNum[] = null;
+                    int inputNum[] = new int[1];
                     String dNum = scanner.nextLine();
-                    Boolean outPut = db.binarySearch(dNum, inputNum, record);
-                    Boolean output = db.deleteRecord(Integer.parseInt(dNum));
-                    System.out.println(output + " Bool deleate");
+                    Record empty = new Record();
+                    empty.empty();
+                    Boolean outPut = db.binarySearch(dNum, inputNum, empty);
+                    // Boolean output = db.deleteRecord(Integer.parseInt(dNum));
                     // System.out.println("\nThis command does not function yet, please try
                     // again...");
                     break;

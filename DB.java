@@ -92,8 +92,10 @@ public class DB {
     private int writeRecord(int recordNum, String id, String lastName, String firstName, String age, String ticketNum,
             String fare, String purchaseDate, RandomAccessFile file) {
         // Writes Records To Given Database
+        // Delete
         try {
-            if (this.id != null) {
+            if (id != null) { // Previous this.id
+                System.out.println(id + (id != null) + " IN WRITE" + recordNum);
                 file.skipBytes(recordSize * this.recordNum);
                 file.writeBytes(String.format("%" + idSize + "s", id.substring(0, Math.min(this.id.length(), idSize))));
                 file.writeBytes(String.format("%" + lNameSize + "s",
@@ -188,7 +190,7 @@ public class DB {
                     din.skipBytes(recordSize * recordNum);
 
                     fields = din.readLine().split("\\s{2,}", 0);
-                    // record.updateFields(fields);
+                    record.updateFields(fields);
                     Success = true;
                 } catch (IOException e) {
                     System.out
@@ -278,11 +280,13 @@ public class DB {
 
         while (!Found && High >= Low) {
             int Middle = (Low + High) / 2;
+
             readRecord(Middle, tempRecord);
-
+            System.out.println("TempRecord: " + tempRecord + " Middle: " + Middle);
             if (tempRecord == null || tempRecord.id.equals("_empty_")) {
-                int nonEmptyRecord = findEmptyRecord(Middle, Low, High);
 
+                int nonEmptyRecord = findEmptyRecord(Middle, Low, High);
+                System.out.println(" tempRecord.id ==" + tempRecord.id + " NonEmptyRecord " + nonEmptyRecord);
                 if (nonEmptyRecord == -1) {
                     recordNum[0] = High; // Set to next index if no non-empty record is found
                     System.out.println("Could not find record with ID " + Id);
@@ -299,9 +303,12 @@ public class DB {
             }
 
             if (tempRecord != null && !tempRecord.id.equals("_empty_")) {
+
                 int result = Integer.parseInt(tempRecord.id) - Integer.parseInt(Id);
+                System.out.println(tempRecord.id + " - " + Id + " =" + result + "=");
                 if (result == 0) {
                     Found = true;
+                    System.err.println("in found");
                     recordNum[0] = Middle;
                     // Update the record object with the found record
                     // (Assuming record has these fields)
@@ -312,6 +319,14 @@ public class DB {
                     record.ticketNum = tempRecord.ticketNum;
                     record.fare = tempRecord.fare;
                     record.purchaseDate = tempRecord.purchaseDate;
+                    int tf = writeRecord(Middle, record.id, record.lastName, record.firstName, record.age,
+                            record.ticketNum, record.fare, record.purchaseDate, file);
+                    if (tf == 1) {
+                        System.out.println(Middle + " Record Deleted");
+                    } else {
+                        System.out.println(Middle + " Record Not Deleted");
+                    }
+
                 } else if (result < 0) {
                     Low = Middle + 1;
                 } else {
@@ -322,7 +337,7 @@ public class DB {
 
         if (!Found || recordNum[0] == 0) {
             recordNum[0] = High; // Set to next index if no suitable spot is found
-            System.out.println("Could not find record with ID " + Id);
+            System.out.println("Could not find record with ID " + Id + ".");
         }
 
         return Found;
@@ -457,8 +472,11 @@ public class DB {
             // Overwrite the record with an empty one
             Record emptyRecord = new Record();
             emptyRecord.empty();
-            writeRecord(recordNumber, emptyRecord.id, emptyRecord.lastName, emptyRecord.firstName, emptyRecord.age,
-                    emptyRecord.ticketNum, emptyRecord.fare, emptyRecord.purchaseDate, file);
+
+            binarySearch(String.valueOf(recordNumber), null, emptyRecord);
+            // writeRecord(recordNumber, emptyRecord.id, emptyRecord.lastName,
+            // emptyRecord.firstName, emptyRecord.age,emptyRecord.ticketNum,
+            // emptyRecord.fare, emptyRecord.purchaseDate, file);
             // String id, String lastName, String firstName, String age, String ticketNum,
             // String fare, String purchaseDate, RandomAccessFile file
             System.out.println("Record " + recordNumber + " deleted successfully.");

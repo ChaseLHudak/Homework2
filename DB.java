@@ -95,7 +95,7 @@ public class DB {
         // Delete
         try {
             if (id != null) { // Previous this.id
-                System.out.println(id + (id != null) + " IN WRITE" + recordNum);
+                System.out.println(id + (id != null) + " IN WRITE" + recordNum + " LastName " + lastName);
                 file.skipBytes(recordSize * this.recordNum);
                 file.writeBytes(String.format("%" + idSize + "s", id.substring(0, Math.min(this.id.length(), idSize))));
                 file.writeBytes(String.format("%" + lNameSize + "s",

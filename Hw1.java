@@ -86,7 +86,7 @@ public class Hw1 {
                     }
                     System.out.print("Please enter passenger id to display: ");
                     String pID = scanner.nextLine();
-                    db.displayRecord(Integer.parseInt(pID));
+                    db.displayRecord(pID);
                     break;
                 case "6":
                     if (!db.isOpen()) {
@@ -95,8 +95,7 @@ public class Hw1 {
                     }
                     System.out.print("Please enter a record number to update: ");
                     String rNum2 = scanner.nextLine();
-                    System.out
-                            .print("Please choose a field(lastName, firstName, age, ticketNum, fare, purchaseDate): ");
+                    System.out.print("Please choose a field(lastName, firstName, age, ticketNum, fare, purchaseDate): ");
                     String oldField = scanner.nextLine();
                     System.out.print("Please chose what to replace it with: ");
                     String newField = scanner.nextLine();

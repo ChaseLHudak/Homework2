@@ -94,20 +94,13 @@ public class DB {
         try {
             if (id != null) { // Previous this.id
                 writeFile.skipBytes(recordSize * recordNum);
-                writeFile
-                        .writeBytes(String.format("%-" + idSize + "s", id.substring(0, Math.min(id.length(), idSize))));
-                writeFile.writeBytes(String.format("%-" + lNameSize + "s",
-                        lastName.substring(0, Math.min(lastName.length(), lNameSize))));
-                writeFile.writeBytes(String.format("%-" + fNameSize + "s",
-                        firstName.substring(0, Math.min(firstName.length(), fNameSize))));
-                writeFile.writeBytes(
-                        String.format("%-" + ageSize + "s", age.substring(0, Math.min(age.length(), ageSize))));
-                writeFile.writeBytes(String.format("%-" + tNumSize + "s",
-                        ticketNum.substring(0, Math.min(ticketNum.length(), tNumSize))));
-                writeFile.writeBytes(
-                        String.format("%-" + fareSize + "s", fare.substring(0, Math.min(fare.length(), fareSize))));
-                writeFile.writeBytes(String.format("%-" + pDateSize + "s\n",
-                        purchaseDate.substring(0, Math.min(purchaseDate.length(), pDateSize))));
+                writeFile.writeBytes(String.format("%-" + idSize + "s", id.substring(0, Math.min(id.length(), idSize))));
+                writeFile.writeBytes(String.format("%-" + lNameSize + "s", lastName.substring(0, Math.min(lastName.length(), lNameSize))));
+                writeFile.writeBytes(String.format("%-" + fNameSize + "s", firstName.substring(0, Math.min(firstName.length(), fNameSize))));
+                writeFile.writeBytes(String.format("%-" + ageSize + "s", age.substring(0, Math.min(age.length(), ageSize))));
+                writeFile.writeBytes(String.format("%-" + tNumSize + "s", ticketNum.substring(0, Math.min(ticketNum.length(), tNumSize))));
+                writeFile.writeBytes(String.format("%-" + fareSize + "s", fare.substring(0, Math.min(fare.length(), fareSize))));
+                writeFile.writeBytes(String.format("%-" + pDateSize + "s\n", purchaseDate.substring(0, Math.min(purchaseDate.length(), pDateSize))));
                 numRecords++;
             } else {
                 System.out.println("ID is null.");
@@ -400,8 +393,7 @@ public class DB {
 
             // If the record is empty, write the new record
             RandomAccessFile file = new RandomAccessFile(openFileName + ".data", "rw");
-            writeRecord(recordNum, newRecord.id, newRecord.lastName, newRecord.firstName, newRecord.age,
-                    newRecord.ticketNum, newRecord.fare, newRecord.purchaseDate, file);
+            writeRecord(recordNum, newRecord.id, newRecord.lastName, newRecord.firstName, newRecord.age, newRecord.ticketNum, newRecord.fare, newRecord.purchaseDate, file);
             System.out.println("Record added successfully.");
         } catch (Exception e) {
             System.out.println("Error occurred while adding a new record: " + e.getMessage());
@@ -411,90 +403,95 @@ public class DB {
 
     // EXPAND DATABASE
     private void expandDatabase(int recordNum, Record newRecord) throws IOException {
-        // Calculate new record size and total number of records
-        int newRecordSize = recordSize;
-        int newNumRecords = numRecords * 2;
+        numRecords++;
 
-        // Create a new database file with double the size
-        RandomAccessFile file = new RandomAccessFile(openFileName + ".data", "rw");
-        file.seek(file.length());
-        writeRecord(numRecords + 1, newRecord.id, newRecord.lastName, newRecord.firstName, newRecord.age,
-                newRecord.ticketNum, newRecord.fare, newRecord.purchaseDate, file);
-        for (int i = numRecords; i <= newNumRecords - 1; i++) {
-            emptyRecord();
-            writeRecord(i, id, lastName, firstName, age, ticketNum, fare, purchaseDate, file);
+        // Check if the specified record number is empty
+        Record tempRecord = new Record();
+        if (!readRecord(recordNum, tempRecord) || !tempRecord.id.equals("_empty_")) {
+            // If the record is not empty, rewrite the entire database
+            RandomAccessFile file = new RandomAccessFile(openFileName + ".data", "rw");
+            file.setLength(0); // Clear the file
+            this.din = new RandomAccessFile(openFileName + ".csv", "r");
+
+            String line = this.din.readLine();
+            for (int i = 0; i < numRecords; i++) {
+                line = this.din.readLine();
+                if (line != null) {
+                    readCsv(line);
+                    if (Integer.parseInt(newRecord.id) == i) {
+                        // WRITE NEW RECORD
+                        writeRecord(i, newRecord.id, newRecord.lastName, newRecord.firstName, newRecord.age, newRecord.ticketNum, newRecord.fare, newRecord.purchaseDate, file);
+                        // WRITE EMPTY RECORD
+                        emptyRecord();
+                        writeRecord(i, id, lastName, firstName, age, ticketNum, fare, purchaseDate, file);
+                    } else {
+                        // WRITE REAL RECORD
+                        writeRecord(i, id, lastName, firstName, age, ticketNum, fare, purchaseDate, file);
+                        // WRITE EMPTY RECORD
+                        emptyRecord();
+                        writeRecord(i, id, lastName, firstName, age, ticketNum, fare, purchaseDate, file);
+                    }
+                }
+            }
+            file.close();
         }
 
         // Update the configuration file with the new record size and number of records
         RandomAccessFile configFile = openFile(openFileName + ".config");
-        configFile.writeBytes(newNumRecords + " " + newRecordSize);
+        configFile.writeBytes(numRecords + " " + recordSize);
         configFile.close();
     }
 
     // UPDATE RECORD
-    public void updateRecord(int recordNum, String oldField, String newField) {
+// UPDATE RECORD
+    public boolean updateRecord(int recordNum, String fieldToChange, String newValue) {
         if (!isOpen()) {
             System.out.println("Database is not open.");
-            return;
-        }
-
-        if (recordNum < 0 || recordNum >= numRecords) {
-            System.out.println("Invalid record number.");
-            return;
+            return false;
         }
 
         try {
-            RandomAccessFile file = new RandomAccessFile(openFileName + ".data", "rw");
-            long offset = recordNum * recordSize; // Calculate the offset for the record
-            file.seek(offset); // Move to the position of the record
-
-            // Read the existing line
-            String line = file.readLine();
-            String[] fields = line.split("\\s{2,}", 0);
-
-            // Find the index of the oldField
-            int fieldIndex = -1;
-            switch (oldField) {
-                case "lastName":
-                    fieldIndex = 1;
-                    break;
-                case "firstName":
-                    fieldIndex = 2;
-                    break;
-                case "age":
-                    fieldIndex = 3;
-                    break;
-                case "ticketNum":
-                    fieldIndex = 4;
-                    break;
-                case "fare":
-                    fieldIndex = 5;
-                    break;
-                case "purchaseDate":
-                    fieldIndex = 6;
-                    break;
-                default:
-                    System.out.println("Invalid field.");
-                    file.close();
-                    return;
+            Record tempRecord = new Record();
+            if (readRecord(recordNum, tempRecord)) {
+                if (tempRecord.id.equals("_empty_")) {
+                    System.out.println("Cannot update an empty record.");
+                    return false;
+                }
+                switch (fieldToChange) {
+                    case "id":
+                        tempRecord.id = newValue;
+                        break;
+                    case "lastName":
+                        tempRecord.lastName = newValue;
+                        break;
+                    case "firstName":
+                        tempRecord.firstName = newValue;
+                        break;
+                    case "age":
+                        tempRecord.age = newValue;
+                        break;
+                    case "ticketNum":
+                        tempRecord.ticketNum = newValue;
+                        break;
+                    case "fare":
+                        tempRecord.fare = newValue;
+                        break;
+                    case "purchaseDate":
+                        tempRecord.purchaseDate = newValue;
+                        break;
+                    default:
+                        System.out.println("Invalid field.");
+                        return false;
+                }
+                RandomAccessFile file = new RandomAccessFile(openFileName + ".data", "rw");
+                writeRecord(recordNum, tempRecord.id, tempRecord.lastName, tempRecord.firstName, tempRecord.age, tempRecord.ticketNum, tempRecord.fare, tempRecord.purchaseDate, file);
+                return true;
             }
-
-            // Update the field with the new value
-            if (fieldIndex != -1) {
-                // Pad the new field value with spaces to match the field size
-                String paddedField = String.format("%-" + getFieldSize(fieldIndex) + "s", newField);
-                fields[fieldIndex] = paddedField;
-                // Rewrite the entire record back to the file
-                file.seek(offset); // Move back to the same position
-                file.writeBytes(String.join("  ", fields)); // Rewrite the modified record
-                System.out.println("Record updated successfully.");
-            }
-
-            file.close();
         } catch (IOException e) {
             System.out.println("Error updating record.");
             e.printStackTrace();
         }
+        return false;
     }
 
     // Helper method to get the size of each field based on the field index

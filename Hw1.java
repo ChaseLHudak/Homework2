@@ -114,7 +114,6 @@ public class Hw1 {
                     String dNum = scanner.nextLine();
                     Record empty = new Record();
                     empty.empty();
-                    System.out.println(empty.lastName);
                     Boolean outPut = db.binarySearch(dNum, inputNum, empty);
                     Boolean output = db.deleteRecord(Integer.parseInt(dNum));
                     break;

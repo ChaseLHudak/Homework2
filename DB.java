@@ -94,7 +94,8 @@ public class DB {
         try {
             if (id != null) { // Previous this.id
                 writeFile.skipBytes(recordSize * recordNum);
-                writeFile.writeBytes(String.format("%-" + idSize + "s", id.substring(0, Math.min(id.length(), idSize))));
+                writeFile
+                        .writeBytes(String.format("%-" + idSize + "s", id.substring(0, Math.min(id.length(), idSize))));
                 writeFile.writeBytes(String.format("%-" + lNameSize + "s",
                         lastName.substring(0, Math.min(lastName.length(), lNameSize))));
                 writeFile.writeBytes(String.format("%-" + fNameSize + "s",
@@ -284,14 +285,12 @@ public class DB {
             int Middle = (Low + High) / 2;
 
             readRecord(Middle, tempRecord);
-            System.out.println("TempRecord: " + tempRecord + " Middle: " + Middle);
             if (tempRecord == null || tempRecord.id.equals("_empty_")) {
 
                 int nonEmptyRecord = findEmptyRecord(Middle, Low, High);
-                System.out.println(" tempRecord.id ==" + tempRecord.id + " NonEmptyRecord " + nonEmptyRecord);
                 if (nonEmptyRecord == -1) {
                     recordNum[0] = High; // Set to next index if no non-empty record is found
-                    System.out.println("Could not find record with ID " + Id);
+                    // System.out.println("Could not find record with ID " + Id);
                     return false;
                 }
                 Middle = nonEmptyRecord;
@@ -307,10 +306,10 @@ public class DB {
             if (tempRecord != null && !tempRecord.id.equals("_empty_")) {
 
                 int result = Integer.parseInt(tempRecord.id) - Integer.parseInt(Id);
-                System.out.println(tempRecord.id + " - " + Id + " =" + result + "=");
+                // System.out.println(tempRecord.id + " - " + Id + " =" + result + "=");
                 if (result == 0) {
                     Found = true;
-                    System.err.println("in found");
+                    // System.err.println("in found");
                     recordNum[0] = Middle;
                     // Update the record object with the found record
                     // (Assuming record has these fields)
@@ -323,12 +322,14 @@ public class DB {
                         record.fare = tempRecord.fare;
                         record.purchaseDate = tempRecord.purchaseDate;
                     }
-                    System.err.println(file + " fileName" + this.file + " " + din);
-                    int tf = writeRecord(Middle, record.id, record.lastName, record.firstName, record.age, record.ticketNum, record.fare, record.purchaseDate, file);
-                    if (tf == 1) {
-                        System.out.println(Middle + " Record Deleted");
+                    int tf = writeRecord(Middle, record.id, record.lastName, record.firstName, record.age,
+                            record.ticketNum, record.fare, record.purchaseDate, file);
+                    Found = true;
+                    if (tf == 1 && Found) {
+                        System.out.println("Record #" + Middle + " Updated");
+                        return true;
                     } else {
-                        System.out.println(Middle + " Record Not Deleted");
+                        // System.out.println(Middle + " Record Not Deleted");
                     }
 
                 } else if (result < 0) {
@@ -336,14 +337,16 @@ public class DB {
                 } else {
                     High = Middle - 1;
                 }
+            } else {
+                System.out.println("Record NOT found");
             }
         }
 
         if (!Found || recordNum[0] == 0) {
             recordNum[0] = High; // Set to next index if no suitable spot is found
-            System.out.println("Could not find record with ID " + Id + ".");
+            // System.out.println("Could not find record with ID " + Id + ".");
         }
-
+        System.out.println(Found);
         return Found;
     }
 
@@ -478,21 +481,14 @@ public class DB {
             emptyRecord.empty();
             int[] recordNumPass = new int[1];
             binarySearch(String.valueOf(recordNumber), recordNumPass, emptyRecord);
-            // writeRecord(recordNumber, emptyRecord.id, emptyRecord.lastName,
-            // emptyRecord.firstName, emptyRecord.age,emptyRecord.ticketNum,
-            // emptyRecord.fare, emptyRecord.purchaseDate, file);
-            // String id, String lastName, String firstName, String age, String ticketNum,
-            // String fare, String purchaseDate, RandomAccessFile file
-            System.out.println("Record " + recordNumber + " deleted successfully.");
             return true;
         } else {
-            System.out.println("Record " + recordNumber + " not found.");
+
             return false;
         }
     }
 
     // // ADD RECORD
-
 
     private int findEmptyRecord(int start, int lowLimit, int highLimit) {
         int backStep = 1; // Step size for backward search

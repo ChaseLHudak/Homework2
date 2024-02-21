@@ -217,7 +217,7 @@ public class DB {
             return false;
         }
 
-        if (readRecord(recordNum, record)) {
+        if (readRecord(recordFoundNum[0], record)) {
             System.out.println("Record found:");
             System.out.println("Passenger ID: " + record.id);
             System.out.println("Last Name: " + record.lastName);
@@ -532,7 +532,11 @@ public class DB {
             emptyRecord.empty();
             int[] recordNumPass = new int[1];
             binarySearch(String.valueOf(recordNumber), recordNumPass, emptyRecord);
-            System.out.println("Record " + recordNumber + " deleted successfully.");
+            writeRecord(recordNumPass[0], emptyRecord.id, emptyRecord.lastName, emptyRecord.firstName, emptyRecord.age,
+                    emptyRecord.ticketNum, emptyRecord.fare, emptyRecord.purchaseDate, file); // ADDED because chase
+                                                                                              // deleted code for it to
+                                                                                              // work
+            // System.out.println("Record " + recordNumber + " deleted successfully.");
             return true;
         } else {
 

@@ -89,8 +89,7 @@ public class DB {
     }
 
     // WRITE RECORD
-    private int writeRecord(int recordNum, String id, String lastName, String firstName, String age, String ticketNum,
-            String fare, String purchaseDate, RandomAccessFile writeFile) {
+    private int writeRecord(int recordNum, String id, String lastName, String firstName, String age, String ticketNum, String fare, String purchaseDate, RandomAccessFile writeFile) {
         try {
             if (id != null) { // Previous this.id
                 writeFile.skipBytes(recordSize * recordNum);
@@ -190,8 +189,7 @@ public class DB {
                     record.updateFields(fields);
                     Success = true;
                 } catch (IOException e) {
-                    System.out
-                            .println("There was an error while attempting to read a record from the database file.\n");
+                    System.out.println("There was an error while attempting to read a record from the database file.\n");
                     e.printStackTrace();
                 }
             } else {
@@ -231,40 +229,9 @@ public class DB {
         }
     }
 
-    // // BINARY SEARCH
-    // public boolean binarySearch(String passengerId) throws IOException {
-    // if (!isOpen()) {
-    // System.out.println("Database is not open.");
-    // return false;
-    // }
-
-    // int low = 0;
-    // int high = numRecords - 1;
-
-    // while (low <= high) {
-    // int mid = (low + high) / 2;
-    // Record record = new Record();
-    // if (readRecord(mid, record)) {
-    // if (record.id.equals(passengerId)) {
-    // recordNum = mid; // Set recordNum to the index of the found record
-    // return true;
-    // } else if (record.id.compareTo(passengerId) < 0) {
-    // low = mid + 1;
-    // } else {
-    // high = mid - 1;
-    // }
-    // } else {
-    // System.out.println("Error reading record.");
-    // return false;
-    // }
-    // }
-
-    // return false; // Record not found
-    // }
-
     /**
      * Binary Search by record Id
-     * 
+     *
      * @param Id
      * @param recordNum to store record num location
      * @param record    to store the fields
@@ -277,40 +244,34 @@ public class DB {
         try {
             file = openFile(openFileName + ".data");
         } catch (Exception e) {
-            // TODO: handle exception
+            // Handle exception appropriately
         }
 
         while (!Found && High >= Low) {
             int Middle = (Low + High) / 2;
 
             readRecord(Middle, tempRecord);
-            System.out.println("TempRecord: " + tempRecord + " Middle: " + Middle);
-            if (tempRecord == null || tempRecord.id.equals("_empty_")) {
-
-                int nonEmptyRecord = findEmptyRecord(Middle, Low, High);
-                System.out.println(" tempRecord.id ==" + tempRecord.id + " NonEmptyRecord " + nonEmptyRecord);
+            if (tempRecord.id.equals("_empty_")) {
+                int nonEmptyRecord = findNonEmptyRecord(Middle, Low, High);
                 if (nonEmptyRecord == -1) {
-                    recordNum[0] = High; // Set to next index if no non-empty record is found
-                    System.out.println("Could not find record with ID " + Id);
-                    return false;
+                    Found = false; // No non-empty record found
+                    break;
                 }
                 Middle = nonEmptyRecord;
                 readRecord(Middle, tempRecord);
-
-                if (Integer.parseInt(tempRecord.id) > Integer.parseInt(Id)) {
-                    recordNum[0] = Middle - 1;
-                } else {
-                    recordNum[0] = Middle + 1;
-                }
             }
 
-            if (tempRecord != null && !tempRecord.id.equals("_empty_")) {
+            if (!tempRecord.id.equals("_empty_")) {
+                int result;
+                try {
+                    result = Integer.parseInt(tempRecord.id) - Integer.parseInt(Id);
+                } catch (NumberFormatException e) {
+                    // Handle exception: if the ID or tempRecord.id cannot be parsed, set result to a non-zero value
+                    result = 1;
+                }
 
-                int result = Integer.parseInt(tempRecord.id) - Integer.parseInt(Id);
-                System.out.println(tempRecord.id + " - " + Id + " =" + result + "=");
                 if (result == 0) {
                     Found = true;
-                    System.err.println("in found");
                     recordNum[0] = Middle;
                     // Update the record object with the found record
                     // (Assuming record has these fields)
@@ -323,14 +284,6 @@ public class DB {
                         record.fare = tempRecord.fare;
                         record.purchaseDate = tempRecord.purchaseDate;
                     }
-                    System.err.println(file + " fileName" + this.file + " " + din);
-                    int tf = writeRecord(Middle, record.id, record.lastName, record.firstName, record.age, record.ticketNum, record.fare, record.purchaseDate, file);
-                    if (tf == 1) {
-                        System.out.println(Middle + " Record Deleted");
-                    } else {
-                        System.out.println(Middle + " Record Not Deleted");
-                    }
-
                 } else if (result < 0) {
                     Low = Middle + 1;
                 } else {
@@ -346,6 +299,43 @@ public class DB {
 
         return Found;
     }
+
+    private int findNonEmptyRecord(int start, int lowLimit, int highLimit) {
+        int backStep = 1; // Step size for backward search
+        int forwardStep = 1; // Step size for forward search
+
+        // Loop to search in both directions
+        while (true) {
+            // Check backwards
+            if (start - backStep >= lowLimit) {
+                Record record = new Record();
+                readRecord(start - backStep, record);
+                if (!record.id.equals("_empty_")) {
+                    return start - backStep;
+                }
+                backStep += 1;
+            }
+
+            // Check forwards
+            if (start + forwardStep <= highLimit) {
+                Record record = new Record();
+                readRecord(start + forwardStep, record);
+                if (!record.id.equals("_empty_")) {
+                    return start + forwardStep;
+                }
+                forwardStep += 1;
+            }
+
+            // Terminate if we've reached the end of the search range
+            if (start - backStep < lowLimit && start + forwardStep > highLimit) {
+                break;
+            }
+        }
+
+        return -1; // No non-empty record found
+    }
+
+
 
     // CREATE REPORT
     public boolean createReport() throws IOException {
@@ -377,7 +367,67 @@ public class DB {
         return true;
     }
 
-    // UPDATE RECORD
+    // ADD RECORD
+    public void addRecord(int recordNum, Record newRecord) {
+        if (!isOpen()) {
+            System.out.println("Database is not open.");
+            return;
+        }
+        if (recordNum < 0 || recordNum >= numRecords) {
+            System.out.println("Invalid record number.");
+            return;
+        }
+
+        // Check if the record at the specified record number is empty
+        Record tempRecord = new Record();
+        try {
+            if (!readRecord(recordNum, tempRecord)) {
+                System.out.println("Error reading record.");
+                return;
+            }
+
+            // If the record is not empty, notify the user and return
+            if (!tempRecord.id.equals("_empty_")) {
+                System.out.println("Record at record number " + recordNum + " is not empty.");
+                expandDatabase(recordNum, newRecord);
+                System.out.println("Expanded database and added record!");
+                return;
+            }
+
+            // If the record is empty, write the new record
+            RandomAccessFile file = new RandomAccessFile(openFileName + ".data", "rw");
+            writeRecord(recordNum, newRecord.id, newRecord.lastName, newRecord.firstName, newRecord.age, newRecord.ticketNum, newRecord.fare, newRecord.purchaseDate, file);
+            System.out.println("Record added successfully.");
+        } catch (Exception e) {
+            System.out.println("Error occurred while adding a new record: " + e.getMessage());
+        }
+
+
+    }
+
+
+
+    // EXPAND DATABASE
+    private void expandDatabase(int recordNum, Record newRecord) throws IOException {
+        // Calculate new record size and total number of records
+        int newRecordSize = recordSize;
+        int newNumRecords = numRecords * 2;
+
+        // Create a new database file with double the size
+        RandomAccessFile file = new RandomAccessFile(openFileName + ".data", "rw");
+        file.seek(file.length());
+        writeRecord(numRecords + 1, newRecord.id, newRecord.lastName, newRecord.firstName, newRecord.age, newRecord.ticketNum, newRecord.fare, newRecord.purchaseDate, file);
+        for (int i = numRecords; i <= newNumRecords - 1; i++) {
+            emptyRecord();
+            writeRecord(i, id, lastName, firstName, age, ticketNum, fare, purchaseDate, file);
+        }
+
+        // Update the configuration file with the new record size and number of records
+        RandomAccessFile configFile = openFile(openFileName + ".config");
+        configFile.writeBytes(newNumRecords + " " + newRecordSize);
+        configFile.close();
+    }
+
     // UPDATE RECORD
     public void updateRecord(int recordNum, String oldField, String newField) {
         if (!isOpen()) {
@@ -391,7 +441,7 @@ public class DB {
         }
 
         try {
-            RandomAccessFile file = new RandomAccessFile("Titanic.data", "rw");
+            RandomAccessFile file = new RandomAccessFile(openFileName + ".data", "rw");
             long offset = recordNum * recordSize; // Calculate the offset for the record
             file.seek(offset); // Move to the position of the record
 
@@ -478,11 +528,6 @@ public class DB {
             emptyRecord.empty();
             int[] recordNumPass = new int[1];
             binarySearch(String.valueOf(recordNumber), recordNumPass, emptyRecord);
-            // writeRecord(recordNumber, emptyRecord.id, emptyRecord.lastName,
-            // emptyRecord.firstName, emptyRecord.age,emptyRecord.ticketNum,
-            // emptyRecord.fare, emptyRecord.purchaseDate, file);
-            // String id, String lastName, String firstName, String age, String ticketNum,
-            // String fare, String purchaseDate, RandomAccessFile file
             System.out.println("Record " + recordNumber + " deleted successfully.");
             return true;
         } else {
@@ -490,9 +535,6 @@ public class DB {
             return false;
         }
     }
-
-    // // ADD RECORD
-
 
     private int findEmptyRecord(int start, int lowLimit, int highLimit) {
         int backStep = 1; // Step size for backward search

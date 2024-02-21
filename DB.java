@@ -274,7 +274,7 @@ public class DB {
                     // a non-zero value
                     result = 1;
                 }
-
+                result = Integer.parseInt(tempRecord.id) - Integer.parseInt(Id);
                 if (result == 0) {
                     Found = true;
                     recordNum[0] = Middle;

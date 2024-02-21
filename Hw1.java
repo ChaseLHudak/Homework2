@@ -1,4 +1,3 @@
-
 //Author: Keidan Smith and Susan Gauch
 //Program Name: Hw1.java
 import java.io.IOException;
@@ -69,7 +68,6 @@ public class Hw1 {
                     record = new Record();
                     try {
                         if (db.readRecord(Integer.parseInt(rNum), record)) {
-                            // record = db.currentRecord();
                             System.out.println("\nRecordNum " + rNum + ": " + record.toString());
                         } else {
                             System.out.println("RecordNum " + rNum + ": Could not be read");
@@ -82,19 +80,15 @@ public class Hw1 {
                 case "5":
                     System.out.print("Please enter passenger id to display: ");
                     String pID = scanner.nextLine();
-                    int[] recordNum = new int[1];
                     boolean found = db.displayRecord(pID);
-                    if (found) {
-                        // System.out.println("RecordNum " + recordNum[0] + ": " + record.toString());
-                    } else {
+                    if (!found) {
                         System.out.println("Record with passenger id " + pID + " not found.");
                     }
                     break;
                 case "6":
                     System.out.print("Please enter a record number to update: ");
                     String rNum2 = scanner.nextLine();
-                    System.out
-                            .print("Please choose a field(lastName, firstName, age, ticketNum, fare, purchaseDate): ");
+                    System.out.print("Please choose a field(lastName, firstName, age, ticketNum, fare, purchaseDate): ");
                     String oldField = scanner.nextLine();
                     System.out.print("Please chose what to replace it with: ");
                     String newField = scanner.nextLine();
@@ -103,11 +97,36 @@ public class Hw1 {
                 case "7":
                     db.createReport();
                     break;
-                // 8) Add Record TO BE IMPLEMENTED IN PART II
                 case "8":
-                    System.out.println("\nThis command does not function yet, please try again...");
+                    System.out.println("Enter details for the new record:");
+                    System.out.print("Record num to overwrite: ");
+                    String recordNum = scanner.nextLine();
+                    System.out.print("ID: ");
+                    String newId = scanner.nextLine();
+                    System.out.print("Last Name: ");
+                    String newLastName = scanner.nextLine();
+                    System.out.print("First Name: ");
+                    String newFirstName = scanner.nextLine();
+                    System.out.print("Age: ");
+                    String newAge = scanner.nextLine();
+                    System.out.print("Ticket Number: ");
+                    String newTicketNum = scanner.nextLine();
+                    System.out.print("Fare: ");
+                    String newFare = scanner.nextLine();
+                    System.out.print("Purchase Date: ");
+                    String newPurchaseDate = scanner.nextLine();
+
+                    Record newRecord = new Record();
+                    newRecord.id = newId;
+                    newRecord.lastName = newLastName;
+                    newRecord.firstName = newFirstName;
+                    newRecord.age = newAge;
+                    newRecord.ticketNum = newTicketNum;
+                    newRecord.fare = newFare;
+                    newRecord.purchaseDate = newPurchaseDate;
+
+                    db.addRecord(Integer.parseInt(recordNum), newRecord);
                     break;
-                // 9) Delete Record TO BE IMPLEMENTED IN PART II
                 case "9":
                     System.out.print("Please enter a record number to delete: ");
                     int inputNum[] = new int[1];
@@ -117,14 +136,12 @@ public class Hw1 {
                     Boolean outPut = db.binarySearch(dNum, inputNum, empty);
                     Boolean output = db.deleteRecord(Integer.parseInt(dNum));
                     break;
-                // 10) Quit
                 case "10":
                     if (db.isOpen())
                         System.out.println("\nPlease close the database before quitting.\n");
                     else
                         Done = true;
                     break;
-                // Default
                 default:
                     System.out.println("\nNot a valid command, please try again...");
             }

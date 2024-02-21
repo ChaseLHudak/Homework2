@@ -1,4 +1,5 @@
-//Author: Keidan Smith and Susan Gauch
+
+//Author: Keidan Smith, Susan Gauch, Ben Keller, Chase Hudak
 //Program Name: Hw1.java
 import java.io.IOException;
 import java.util.Scanner;
@@ -63,6 +64,10 @@ public class Hw1 {
                     break;
                 // 4) Read Record
                 case "4":
+                    if (!db.isOpen()) {
+                        System.out.println("Please open a database before continuing.");
+                        break;
+                    }
                     System.out.print("Please enter record number to read: ");
                     String rNum = scanner.nextLine();
                     record = new Record();
@@ -78,6 +83,10 @@ public class Hw1 {
                     }
                     break;
                 case "5":
+                    if (!db.isOpen()) {
+                        System.out.println("Please open a database before continuing.");
+                        break;
+                    }
                     System.out.print("Please enter passenger id to display: ");
                     String pID = scanner.nextLine();
                     boolean found = db.displayRecord(pID);
@@ -86,18 +95,31 @@ public class Hw1 {
                     }
                     break;
                 case "6":
+                    if (!db.isOpen()) {
+                        System.out.println("Please open a database before continuing.");
+                        break;
+                    }
                     System.out.print("Please enter a record number to update: ");
                     String rNum2 = scanner.nextLine();
-                    System.out.print("Please choose a field(lastName, firstName, age, ticketNum, fare, purchaseDate): ");
+                    System.out
+                            .print("Please choose a field(lastName, firstName, age, ticketNum, fare, purchaseDate): ");
                     String oldField = scanner.nextLine();
                     System.out.print("Please chose what to replace it with: ");
                     String newField = scanner.nextLine();
                     db.updateRecord(Integer.parseInt(rNum2), oldField, newField);
                     break;
                 case "7":
+                    if (!db.isOpen()) {
+                        System.out.println("Please open a database before continuing.");
+                        break;
+                    }
                     db.createReport();
                     break;
                 case "8":
+                    if (!db.isOpen()) {
+                        System.out.println("Please open a database before continuing.");
+                        break;
+                    }
                     System.out.println("Enter details for the new record:");
                     System.out.print("Record num to overwrite: ");
                     String recordNum = scanner.nextLine();
@@ -128,6 +150,10 @@ public class Hw1 {
                     db.addRecord(Integer.parseInt(recordNum), newRecord);
                     break;
                 case "9":
+                    if (!db.isOpen()) {
+                        System.out.println("Please open a database before continuing");
+                        break;
+                    }
                     System.out.print("Please enter a record number to delete: ");
                     int inputNum[] = new int[1];
                     String dNum = scanner.nextLine();

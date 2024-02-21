@@ -1,5 +1,6 @@
 
-//Author: Keidan Smith
+//Author: Keidan Smith, Ben Keller, Chase Hudak
+//Modified from HW1 Sol
 //Program Name: DB.java
 import java.io.File;
 import java.io.FileNotFoundException;

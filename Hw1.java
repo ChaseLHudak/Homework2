@@ -35,13 +35,11 @@ public class Hw1 {
 
             // Switch to handle user input
             switch (command) {
-                // 1) Create New Database
                 case "1":
                     System.out.print("Please enter name of csv file: ");
                     String fileName = scanner.nextLine();
                     db.createDB(fileName);
                     break;
-                // 2) Open Database
                 case "2":
                     System.out.print("Enter name of database to open: ");
                     String databaseName = scanner.nextLine();
@@ -61,7 +59,6 @@ public class Hw1 {
                         System.out.println("\nThere is not a database currently open...");
                     }
                     break;
-                // 4) Read Record
                 case "4":
                     System.out.print("Please enter record number to read: ");
                     String rNum = scanner.nextLine();
@@ -80,10 +77,7 @@ public class Hw1 {
                 case "5":
                     System.out.print("Please enter passenger id to display: ");
                     String pID = scanner.nextLine();
-                    boolean found = db.displayRecord(pID);
-                    if (!found) {
-                        System.out.println("Record with passenger id " + pID + " not found.");
-                    }
+                    db.displayRecord(Integer.parseInt(pID));
                     break;
                 case "6":
                     System.out.print("Please enter a record number to update: ");
@@ -103,6 +97,11 @@ public class Hw1 {
                     String recordNum = scanner.nextLine();
                     System.out.print("ID: ");
                     String newId = scanner.nextLine();
+                    // Validate if the input ID is an integer
+                    if (!newId.matches("\\d+")) {
+                        System.out.println("ID must be an integer. Please try again.");
+                        break;
+                    }
                     System.out.print("Last Name: ");
                     String newLastName = scanner.nextLine();
                     System.out.print("First Name: ");

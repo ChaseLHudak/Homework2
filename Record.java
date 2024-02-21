@@ -1,3 +1,5 @@
+//Author: Ben Keller, Chase Hudak
+
 import java.io.IOException;
 
 public class Record {
